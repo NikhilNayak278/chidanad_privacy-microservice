@@ -2,7 +2,7 @@ from typing import Any, Dict
 from .security import token_for_value, encrypt, decrypt
 from . import storage
 
-TOKEN_PREFIX = "TKN_"
+TOKEN_PREFIX = "Tkn_"
 
 
 def _is_token(value: str) -> bool:
@@ -14,7 +14,9 @@ def _pseudo_value(value: Any) -> Any:
         return value
     if _is_token(value):
         return value
+    print(f"DEBUG: Generating token for value: {value}")
     token = token_for_value(value)
+    print(f"DEBUG: Generated token: {token}")
     storage.save_mapping(token, encrypt(value))
     return token
 
@@ -24,8 +26,19 @@ def _restore_value(value: Any) -> Any:
         return value
     if not _is_token(value):
         return value
+        
     blob = storage.get_mapping(value)
-    return decrypt(blob) if blob is not None else value
+    if blob:
+        return decrypt(blob)
+
+    # Strategy: Try converting Tkn_ to TKN_ (for legacy DB entries)
+    if value.startswith("Tkn_"):
+        legacy_token = "TKN_" + value[4:]
+        blob = storage.get_mapping(legacy_token)
+        if blob:
+            return decrypt(blob)
+
+    return value
 
 
 PII_KEYS_BY_DOC = {

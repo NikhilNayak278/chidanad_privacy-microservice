@@ -21,12 +21,17 @@ def _get_conn() -> sqlite3.Connection:
 
 def save_mapping(token: str, ciphertext: bytes) -> None:
     conn = _get_conn()
+    print(f"DEBUG: Saving mapping for token: {token}")
     try:
         conn.execute(
             "INSERT OR IGNORE INTO mappings(token, ciphertext) VALUES (?, ?)",
             (token, ciphertext),
         )
         conn.commit()
+        print("DEBUG: Saved mapping successfully.")
+    except Exception as e:
+        print(f"DEBUG: Save mapping ERROR: {e}")
+        raise
     finally:
         conn.close()
 

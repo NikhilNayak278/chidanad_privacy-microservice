@@ -24,7 +24,7 @@ fernet = Fernet(FERNET_KEY)
 def token_for_value(value: str) -> str:
     digest = hmac.new(FERNET_KEY, value.encode("utf-8"), hashlib.sha256).digest()
     tok = base64.urlsafe_b64encode(digest).decode("utf-8").rstrip("=")
-    return f"TKN_{tok[:24]}"
+    return f"Tkn_{tok[:24]}"
 
 
 def encrypt(value: str) -> bytes:
