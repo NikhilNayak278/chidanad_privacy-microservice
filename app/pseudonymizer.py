@@ -6,7 +6,7 @@ TOKEN_PREFIX = "TKN_"
 
 
 def _is_token(value: str) -> bool:
-    return isinstance(value, str) and value.startswith(TOKEN_PREFIX)
+    return isinstance(value, str) and value.upper().startswith(TOKEN_PREFIX)
 
 
 def _pseudo_value(value: Any) -> Any:
@@ -22,10 +22,23 @@ def _pseudo_value(value: Any) -> Any:
 def _restore_value(value: Any) -> Any:
     if not isinstance(value, str):
         return value
+    value = value.strip()
     if not _is_token(value):
         return value
-    blob = storage.get_mapping(value)
-    return decrypt(blob) if blob is not None else value
+    
+    # Try fuzzy lookup (handles corrupted case from upstream)
+    blob = storage.get_mapping_fuzzy(value)
+    if blob:
+        return decrypt(blob)
+
+    # If fuzzy failed, try fixing prefix explicitly just in case (redundant but safe)
+    if value.upper().startswith(TOKEN_PREFIX) and not value.startswith(TOKEN_PREFIX):
+        fixed_value = TOKEN_PREFIX + value[4:]
+        blob = storage.get_mapping_fuzzy(fixed_value)
+        if blob:
+            return decrypt(blob)
+
+    return value
 
 
 PII_KEYS_BY_DOC = {
@@ -59,4 +72,5 @@ def reidentify(doc: Dict[str, Any]) -> Dict[str, Any]:
             if k in pii_out and pii_out[k] is not None:
                 pii_out[k] = _restore_value(pii_out[k])
         out["PII"] = pii_out
+    print(out)
     return out
