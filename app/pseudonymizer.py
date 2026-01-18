@@ -6,7 +6,7 @@ TOKEN_PREFIX = "Tkn_"
 
 
 def _is_token(value: str) -> bool:
-    return isinstance(value, str) and value.upper().startswith(TOKEN_PREFIX)
+    return isinstance(value, str) and value.lower().startswith("tkn_")
 
 
 def _pseudo_value(value: Any) -> Any:
@@ -34,7 +34,7 @@ def _restore_value(value: Any) -> Any:
         return decrypt(blob)
 
     # If fuzzy failed, try fixing prefix explicitly just in case (redundant but safe)
-    if value.upper().startswith(TOKEN_PREFIX) and not value.startswith(TOKEN_PREFIX):
+    if value.lower().startswith("tkn_") and not value.startswith(TOKEN_PREFIX):
         fixed_value = TOKEN_PREFIX + value[4:]
         blob = storage.get_mapping_fuzzy(fixed_value)
         if blob:
@@ -44,10 +44,10 @@ def _restore_value(value: Any) -> Any:
 
 
 PII_KEYS_BY_DOC = {
-    "Medical Report": ["Name", "DOB", "ID", "Date"],
-    "Lab Report": ["Name", "DOB", "ID", "Date"],
-    "Discharge Summary": ["Name", "DOB", "ID", "Admission_Date", "Discharge_Date"],
-    "Admission Slip": ["Name", "DOB", "ID", "Date"],
+    "Medical Report": ["GivenName", "FamilyName", "DOB", "ID", "Date"],
+    "Lab Report": ["GivenName", "FamilyName", "DOB", "ID", "Date"],
+    "Discharge Summary": ["GivenName", "FamilyName", "DOB", "ID", "Admission_Date", "Discharge_Date"],
+    "Admission Slip": ["GivenName", "FamilyName", "DOB", "ID", "Date"],
 }
 
 
