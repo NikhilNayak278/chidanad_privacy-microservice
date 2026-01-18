@@ -1,0 +1,22 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+venv/
+.venv/
+env/
+.env
+
+# VS Code
+.vscode/
+
+# Project specific
+*.db
+*.sqlite3
+db_result.txt
+debug_db.py
+print_db_contents.py
+verify_reid.py
+app/__pycache__/pseudonymizer.cpython-311.pyc
+app/__pycache__/storage.cpython-311.pyc
